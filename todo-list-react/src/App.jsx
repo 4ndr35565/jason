@@ -1,35 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+import TodoItem from "./Todoitem";
+import { useState } from "react";
+
+export default function App() {
+  const [tareas, setTareas] = useState([]);
+  const [input, setInput] = useState("");
+
+  const agregarTarea = () => {
+    if (input.trim()) {
+      setTareas([
+        ...tareas,
+        { id: Date.now(), text: input.trim(), completed: false },
+      ]);
+      setInput("");
+    }
+  };
+
+  const toggleCompleted = (id) => {
+    setTareas(
+      tareas.map((tarea) =>
+        tarea.id === id ? { ...tarea, completed: !tarea.completed } : tarea
+      )
+    );
+  };
+
+  const eliminarTarea = (id) => {
+    setTareas(tareas.filter((tarea) => tarea.id !== id));
+  };
+
+  const editarTarea = (id, newText) => {
+    setTareas(
+      tareas.map((tarea) =>
+        tarea.id === id ? { ...tarea, text: newText } : tarea
+      )
+    );
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="max-w-md mx-auto mt-10 p-2 rounded shadow">
+      <h1 className="text-3xl font-bold mb-5 text-center">LISTA DE TAREAS</h1>
 
-export default App
+      <div className="flex gap-3 mb-5">
+        <input
+          className="flex-1 p-2 border rounded"
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Añadir Tarea"
+        />
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={agregarTarea}
+        >
+          Añadir Tarea
+        </button>
+      </div>
+
+      <div className="space-y-2">
+        {tareas.map((tarea) => (
+          <TodoItem
+            key={tarea.id}
+            tarea={tarea}
+            toggleCompleted={toggleCompleted}
+            eliminarTarea={eliminarTarea}
+            editarTarea={editarTarea}  // 👈 ahora sí se pasa bien
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
